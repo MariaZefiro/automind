@@ -1,0 +1,136 @@
+.auth-layout {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(320px, .92fr) 1.08fr;
+}
+
+.brand-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(36px, 6vw, 88px);
+    overflow: hidden;
+    color: white;
+    background: radial-gradient(ellipse at 15% 88%, rgba(89, 109, 247, .42), transparent 42%), linear-gradient(145deg, #111a3d 0%, #27377d 58%, #4656bc 100%);
+}
+
+.brand-panel::after {
+    content: '';
+    position: absolute;
+    width: 440px;
+    height: 440px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .11);
+    right: -220px;
+    top: 19%;
+    box-shadow: 0 0 0 52px rgba(255, 255, 255, .025), 0 0 0 104px rgba(255, 255, 255, .02);
+}
+
+.brand-mark {
+    position: relative;
+    z-index: 1;
+    font: 800 30px Manrope, sans-serif;
+    letter-spacing: -2px;
+}
+
+.brand-mark span { color: #9ba8ff; }
+
+.brand-copy {
+    position: relative;
+    z-index: 1;
+    max-width: 570px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.eyebrow {
+    color: #c0c8ff !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+}
+
+.brand-copy h2 {
+    margin: 18px 0 20px;
+    font: 700 clamp(42px, 5vw, 68px)/1.12 Manrope, sans-serif;
+    letter-spacing: -2.5px;
+}
+
+.brand-description {
+    max-width: 420px;
+    color: rgba(255, 255, 255, .72) !important;
+    font-size: 17px !important;
+    line-height: 1.75 !important;
+}
+
+.brand-footnote {
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, .48) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.6px !important;
+}
+
+.form-panel {
+    display: grid;
+    place-items: center;
+    padding: 36px;
+    background: linear-gradient(140deg, #fafbfe 0%, #f1f3f9 100%);
+}
+
+.login-card {
+    width: min(100%, 440px);
+    border: 1px solid #e9ebf3;
+    border-radius: 20px !important;
+    box-shadow: 0 22px 65px rgba(28, 39, 84, .08) !important;
+}
+
+.login-card .MuiCardContent-root { padding: 42px; }
+
+.welcome-chip {
+    color: #4357d8 !important;
+    background: #eef0ff !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: .8px !important;
+}
+
+.login-title {
+    margin-top: 24px !important;
+    font: 700 30px Manrope, sans-serif !important;
+    letter-spacing: -1px !important;
+}
+
+.login-subtitle { margin-top: 8px !important; font-size: 14px !important; }
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 32px;
+}
+
+.login-form .MuiOutlinedInput-root { border-radius: 10px; background: white; }
+
+.login-form .MuiButton-root {
+    min-height: 52px;
+    margin-top: 4px;
+    border-radius: 10px;
+    text-transform: none;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 7px 16px rgba(67, 87, 216, .2);
+}
+
+.security-note { display: block; margin-top: 24px; text-align: center; }
+
+@media (max-width: 760px) {
+    .auth-layout { grid-template-columns: 1fr; }
+    .brand-panel { min-height: 300px; padding: 28px; }
+    .brand-copy { margin: 42px 0 32px; }
+    .brand-copy h2 { font-size: 42px; }
+    .brand-footnote { display: none; }
+    .form-panel { padding: 28px 18px 44px; }
+    .login-card .MuiCardContent-root { padding: 30px 24px; }
+}

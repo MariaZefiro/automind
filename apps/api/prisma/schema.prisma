@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  REVIEWER
+  ADMIN
+}
+
+enum RequestStatus {
+  PENDING
+  IN_REVIEW
+  AWAITING_REVIEW
+  APPROVED
+  FORWARDED
+  RESOLVED
+  CANCELLED
+}
+
+enum RequestCategory {
+  ACCESS
+  HARDWARE
+  SOFTWARE
+  INFRASTRUCTURE
+  FINANCE
+  HUMAN_RESOURCES
+  OTHER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ClassificationSource {
+  MANUAL
+  AI
+}
+
+model User {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  name                  String
+  email                 String                 @unique
+  passwordHash          String
+  role                  Role                   @default(USER)
+  departmentId          String?                @db.Uuid
+  department            Department?            @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  authoredRequests      Request[]              @relation("RequestAuthor")
+  reviewedClassifications RequestClassification[] @relation("ClassificationReviewer")
+  historyEntries        RequestHistory[]
+  auditActions          UserAudit[]              @relation("UserAuditActor")
+  auditChanges          UserAudit[]              @relation("UserAuditTarget")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@index([departmentId])
+}
+
+model Department {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  name                  String                 @unique
+  users                 User[]
+  requests              Request[]              @relation("RequestDepartment")
+  suggestedClassifications RequestClassification[] @relation("SuggestedDepartment")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+}
+
+model Request {
+  id           String                   @id @default(uuid()) @db.Uuid
+  title        String
+  description  String
+  status       RequestStatus            @default(PENDING)
+  authorId     String                   @db.Uuid
+  author       User                     @relation("RequestAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  departmentId String?                  @db.Uuid
+  department   Department?              @relation("RequestDepartment", fields: [departmentId], references: [id], onDelete: SetNull)
+  classifications RequestClassification[]
+  history      RequestHistory[]
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+
+  @@index([authorId, createdAt])
+  @@index([status, createdAt])
+  @@index([departmentId])
+}
+
+model RequestClassification {
+  id                    String               @id @default(uuid()) @db.Uuid
+  requestId             String               @db.Uuid
+  request               Request              @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  category              RequestCategory
+  priority              Priority
+  suggestedDepartmentId String?              @db.Uuid
+  suggestedDepartment   Department?          @relation("SuggestedDepartment", fields: [suggestedDepartmentId], references: [id], onDelete: SetNull)
+  summary               String
+  suggestedAction       String
+  confidence            Float?
+  source                ClassificationSource @default(MANUAL)
+  reviewedById          String?              @db.Uuid
+  reviewedBy            User?                @relation("ClassificationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt            DateTime?
+  createdAt             DateTime             @default(now())
+
+  @@index([requestId, createdAt])
+  @@index([suggestedDepartmentId])
+}
+
+model RequestHistory {
+  id          String   @id @default(uuid()) @db.Uuid
+  requestId   String   @db.Uuid
+  request     Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  userId      String?  @db.Uuid
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  description String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([requestId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model UserAudit {
+  id           String   @id @default(uuid()) @db.Uuid
+  actorId      String?  @db.Uuid
+  actor        User?    @relation("UserAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  targetUserId String   @db.Uuid
+  targetUser   User     @relation("UserAuditTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  action       String
+  changes      Json?
+  createdAt    DateTime @default(now())
+
+  @@index([targetUserId, createdAt])
+  @@index([actorId, createdAt])
+}
